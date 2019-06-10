@@ -1,0 +1,55 @@
+---
+title: "Critical Access Hospitals"
+author: "Andres de Loera"
+date: "6/10/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE, cache = TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#Libraries
+
+
+library(readxl)
+library(janitor)
+library(gt)
+library(tidyverse)
+library(ggthemes)
+
+#Data 
+
+cahs_2019 <- read_excel("CAH Data/CAH_List_10_19_18.xlsx",
+                        skip = 1) %>%
+  clean_names()
+
+summary(cahs_2019)
+
+(table(cahs_2019$number_beds))
+
+ca_hospitals_2019 <- read_csv("CAH Data/2018_q4.csv") %>%
+  clean_names()
+
+ca_cahs_2019 <- cahs_2019 %>%
+  filter(stcd == "CA")
+
+```
+
+
+```{r viz, echo = FALSE, cache = TRUE}
+
+cahs_2019 %>%
+  ggplot(aes(x = number_beds)) +
+  geom_bar() +
+  labs(title = "Critical Access Hospitals by Number of Beds",
+       subtitle = "Data from Flex Monitoring Team, 2019", 
+       x = "Number of Beds",
+       y = "Number of CAHs") +
+  theme_calc()
+  
+```
+
+```{r}
+
+```
+
