@@ -19,19 +19,102 @@ library(ggthemes)
 
 #Data 
 
-cahs_2019 <- read_excel("CAH Data/CAH_List_10_19_18.xlsx",
+cahs_2019 <- read_excel("CAH Data/CAH_List_04_18_19.xlsx",
                         skip = 1) %>%
-  clean_names()
+  clean_names() %>%
+  mutate(year = 2019) %>%
+  select(name, city, state = stcd, zip = zip, cert_date = cert_effective_date, beds = number_beds, year)
 
-summary(cahs_2019)
+cahs_2018 <- read_excel("CAH Data/CAH_List_10_19_18.xlsx", 
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2018) %>%
+  select(name, city, state = stcd, zip = zip, cert_date = cert_effective_date, beds = number_beds, year)
 
-(table(cahs_2019$number_beds))
+cahs_2017 <- read_excel("CAH Data/2017-Jul-CAH-List.xlsx",
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2017) %>%
+  select(name, city, state = stcd, zip = zip, cert_date = cert_effective_date, beds = number_beds, year)
 
-ca_hospitals_2019 <- read_csv("CAH Data/2018_q4.csv") %>%
-  clean_names()
+cahs_2016 <- read_excel("CAH Data/2016-Oct-CAH-List.xlsx", 
+                        col_types = c("text", "text", "text", 
+                                      "text", "text", "date", "numeric", 
+                                      "numeric", "numeric", "numeric"), 
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2016) %>%
+  select(name, city, state = stcd, zip = zip, cert_date = cert_effective_date, beds = number_beds, year)
 
-ca_cahs_2019 <- cahs_2019 %>%
-  filter(stcd == "CA")
+cahs_2015 <- read_excel("CAH Data/2015-Oct-CAH-List.xlsx",
+                       skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2015) %>%
+  select(name, city, state = stcd, zip = zip, cert_date = cert_effective_date, beds = number_beds, year)
+
+cahs_2014 <- read_excel("CAH Data/2014-Jun-CAH-List.xlsx") %>%
+  clean_names() %>%
+  mutate(year = 2014) %>%
+  select(name = cahname, city = cahcity, state = cahstate, zip = cahzip, cert_date = cah_eff, beds, year)
+
+
+cahs_2013 <- read_excel("CAH Data/2013-Jun-CAH-List.xlsx", 
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2013) %>%
+  select(name = cahname, city = cahcity, state = cahstate, zip = cahzip, cert_date = cah_eff, beds, year)
+
+cahs_2012 <- read_excel("CAH Data/2012-Sep-CAH-List.xlsx", 
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2012) %>%
+  select(name = cahname, city = cahcity, state = cahstate, zip = cahzip, cert_date = cah_eff, beds, year)
+
+cahs_2011 <- read_excel("CAH Data/2011-Mar-CAH-List.xlsx",
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2011) %>%
+  select(name = cahname, city = cahcity, state = cahstate, zip = cahzip, cert_date = cah_eff, beds, year)
+
+  
+cahs_2010 <- read_excel("CAH Data/2010-Sep-CAH-List.xlsx",
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2010) %>%
+  select(name = cahname, city = cahcity, state = cahstate, zip = cahzip, cert_date = cah_eff, beds, year)
+  
+
+cahs_2009 <- read_excel("CAH Data/2009-Jul-CAH-List.xlsx",
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2009) %>%
+  select(name = cahname, city = cahcity, state = cahstate, zip = cahzip, cert_date = cah_eff, beds, year)
+
+cahs_2008 <- read_excel("CAH Data/2008-Sep-CAH-List.xlsx",
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2008) %>%
+  select(name = cahname, city = cahcity, state = cahstate, zip = cahzip, cert_date = cah_eff, beds, year)
+
+cahs_2007 <- read_excel("CAH Data/2007-Aug-CAH-List.xlsx",
+                        skip = 1) %>%
+  clean_names() %>%
+  mutate(year = 2007) %>%
+  select(name = cahname, city = cahcity, state = cahstate, zip = cahzip, cert_date = cah_eff, beds = number_beds, year)
+
+cahs_all <- rbind(cahs_2007, 
+                  cahs_2008, 
+                  cahs_2009, 
+                  cahs_2010, 
+                  cahs_2011, 
+                  cahs_2012, 
+                  cahs_2013, 
+                  cahs_2014, 
+                  cahs_2015, 
+                  cahs_2016, 
+                  cahs_2017, 
+                  cahs_2018, 
+                  cahs_2019)
 
 ```
 
@@ -39,17 +122,39 @@ ca_cahs_2019 <- cahs_2019 %>%
 ```{r viz, echo = FALSE, cache = TRUE}
 
 cahs_2019 %>%
-  ggplot(aes(x = number_beds)) +
+  ggplot(aes(x = beds)) +
   geom_bar() +
   labs(title = "Critical Access Hospitals by Number of Beds",
        subtitle = "Data from Flex Monitoring Team, 2019", 
        x = "Number of Beds",
        y = "Number of CAHs") +
   theme_calc()
+
+cahs_all %>%
+  filter(year != 2019) %>%
+  ggplot(aes(x = beds)) +
+  geom_bar() +
+  labs(title = "Critical Access Hospitals by Number of Beds",
+       subtitle = "Data from Flex Monitoring Team, 2007-20018", 
+       x = "Number of Beds",
+       y = "Number of CAHs") +
+  theme_calc() +
+  facet_wrap(~year)
   
 ```
 
-```{r}
+```{r viz2, echo = FALSE, cache = TRUE}
+
+cahs_all %>%
+  ggplot(aes(x = year, y = beds)) +
+  geom_jitter(alpha = 0.1) +
+  labs(x = "Year",
+       y = "Beds in Critical Access Hospitals") +
+  scale_x_continuous(breaks = c(2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019),
+                     labels = c("2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019")) +
+  theme_calc() +
+  scale_y_continuous(breaks = c(0, 5, 10, 15, 20, 25), 
+                     labels = c("0", "5", "10", "15", "20", "25"))
 
 ```
 
