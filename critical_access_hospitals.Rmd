@@ -128,38 +128,42 @@ cahs_all <- rbind(cahs_2007,
 #First for 2019
 
 cahs_2019 %>%
-  ggplot(aes(x = beds)) +
+  ggplot(aes(x = beds, fill = "red")) +
   geom_bar() +
   labs(title = "Critical Access Hospitals by Number of Beds",
-       subtitle = "Data from Flex Monitoring Team, 2019", 
+       caption = "Data from Flex Monitoring Team, 2019", 
        x = "Number of Beds",
        y = "Number of CAHs") +
+  scale_fill_calc(guide = FALSE) + 
   theme_calc()
 
 #and then for the prior years going back to 2007.
 
 cahs_all %>%
   filter(year != 2019) %>%
-  ggplot(aes(x = beds)) +
+  ggplot(aes(x = beds, fill = "blue")) +
   geom_bar() +
   labs(title = "Critical Access Hospitals by Number of Beds",
-       subtitle = "Data from Flex Monitoring Team, 2007-20018", 
+       caption = "Data from Flex Monitoring Team, 2007-2018", 
        x = "Number of Beds",
        y = "Number of CAHs") +
   facet_wrap(~year) +  
+  scale_fill_calc(guide = FALSE) + 
   theme_calc()
 
 #I also try a scatterplot (with jitter) representation for all the years.
 
 cahs_all %>%
-  ggplot(aes(x = year, y = beds)) +
+  ggplot(aes(x = year, y = beds, color = "2")) +
   geom_jitter(alpha = 0.1) +
   labs(x = "Year",
-       y = "Beds in Critical Access Hospitals") +
+       y = "Beds in Critical Access Hospitals",
+       caption = "Data from Flex Monitoring Team, 2007-2019") +
   scale_x_continuous(breaks = c(2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019),
                      labels = c("2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019")) +
   scale_y_continuous(breaks = c(0, 5, 10, 15, 20, 25), 
                      labels = c("0", "5", "10", "15", "20", "25")) +
+  scale_color_calc(guide = FALSE) + 
   theme_calc()
   
 ```
@@ -191,18 +195,21 @@ tx_match_2019 <- read_excel("matching.xlsx") %>%
 #Finally I made a bar chart. 
 
 tx_match_2019 %>%
-  filter(total_beds < 51) %>%
-  ggplot(aes(x = total_beds, fill = critical_access)) +
+  filter(med_surg_beds < 51) %>%
+  ggplot(aes(x = med_surg_beds, fill = critical_access)) +
   geom_bar() +
-  labs(title = "Hospital Beds in Texas Hospitals",
+  labs(title = "Medical/Surgical Beds in Texas Hospitals",
        subtitle = "(Hospital with 50 or fewer beds in 2019)",
-       x = "Number of Hospital Beds",
+       x = "Number of Beds",
        y = "Count of Hospitals",
        caption = "Data from the Texas Department of Health and Human Services",
        fill = element_blank()) +
   scale_x_continuous(breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50),
                      labels = c("0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50")) +
-  scale_fill_calc(labels = c("Not CAH", "Critical Access Hospital")) +
+  scale_y_continuous(breaks = c(0, 5, 10, 15, 20, 25, 30),
+                     labels = c("0", "5", "10", "15", "20", "25", "30")) +
+  scale_fill_calc(breaks = c(1,0),
+                  labels = c("Critical Access", "Not CAH")) +
   theme_calc()
 
 
