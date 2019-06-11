@@ -213,6 +213,25 @@ tx_match_2019 %>%
   theme_calc()
 
 
+tx_match_2019 %>%
+  filter(med_surg_beds < 51) %>%
+  ggplot(aes(y = med_surg_beds, x = as.numeric(critical_access), color = critical_access, fill = critical_access)) +
+  geom_violin(alpha = 0.75) +
+  labs(title = "Distribution of Texas Hospitals by Medical/Surgical Beds",
+       subtitle = "(Hospital with 50 or fewer beds in 2019)",
+       y = "Number of Beds",
+       x = element_blank(),
+       caption = "Data from the Texas Department of Health and Human Services",
+       fill = element_blank(),
+       color = element_blank()) +
+  scale_y_continuous(breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50),
+                     labels = c("0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50")) +
+  scale_x_continuous(breaks = c(1, 2),
+                     labels = c("Not CAH", "Critical Access")) +
+  scale_color_calc(guide = FALSE) +
+  scale_fill_calc(guide = FALSE) +
+  theme_calc()
+
 ```
 
 ```{r WY, echo = FALSE, cache = TRUE}
@@ -221,7 +240,7 @@ cahs_all %>%
   filter(state == "WY") %>%
   ggplot(aes(x = year, y = beds, color = name)) +
   geom_line() +
-  geom_jitter(width =.1, height = .1) +
+  geom_jitter(width =.2, height = .2) +
   labs(title = "Beds per hospital in WY, 2007-2019",
        caption = "Data from Flex Monitoring Team",
        x = "Year",
