@@ -8,8 +8,7 @@ output: html_document
 ```{r setup, include=FALSE, cache = TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 
-#Libraries
-
+#I begin by loading in the libraries I will use.
 
 library(readxl)
 library(janitor)
@@ -17,7 +16,8 @@ library(gt)
 library(tidyverse)
 library(ggthemes)
 
-#Data 
+#Now I download the data on critical access hospitals 
+#I downloaded and moved the excel files into my repository by hand, so here I just read them into an r object, call clean names for ease of use, add a year variable, and use select to get a consistent name, selection and ordering of variables. 
 
 cahs_2019 <- read_excel("CAH Data/CAH_List_04_18_19.xlsx",
                         skip = 1) %>%
@@ -102,6 +102,8 @@ cahs_2007 <- read_excel("CAH Data/2007-Aug-CAH-List.xlsx",
   mutate(year = 2007) %>%
   select(name = cahname, city = cahcity, state = cahstate, zip = cahzip, cert_date = cah_eff, beds = number_beds, year)
 
+#Then I bind the consistent dataset together.
+
 cahs_all <- rbind(cahs_2007, 
                   cahs_2008, 
                   cahs_2009, 
@@ -119,7 +121,11 @@ cahs_all <- rbind(cahs_2007,
 ```
 
 
-```{r viz, echo = FALSE, cache = TRUE}
+```{r beds, echo = FALSE, cache = TRUE, warning = FALSE}
+
+#Here I create visualizations of the distribution of critical access hospitals by hospital beds.
+
+#First for 2019
 
 cahs_2019 %>%
   ggplot(aes(x = beds)) +
@@ -130,6 +136,8 @@ cahs_2019 %>%
        y = "Number of CAHs") +
   theme_calc()
 
+#and then for the prior years going back to 2007.
+
 cahs_all %>%
   filter(year != 2019) %>%
   ggplot(aes(x = beds)) +
@@ -138,12 +146,10 @@ cahs_all %>%
        subtitle = "Data from Flex Monitoring Team, 2007-20018", 
        x = "Number of Beds",
        y = "Number of CAHs") +
-  theme_calc() +
-  facet_wrap(~year)
-  
-```
+  facet_wrap(~year) +  
+  theme_calc()
 
-```{r viz2, echo = FALSE, cache = TRUE}
+#I also try a scatterplot (with jitter) representation for all the years.
 
 cahs_all %>%
   ggplot(aes(x = year, y = beds)) +
@@ -152,9 +158,52 @@ cahs_all %>%
        y = "Beds in Critical Access Hospitals") +
   scale_x_continuous(breaks = c(2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019),
                      labels = c("2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019")) +
-  theme_calc() +
   scale_y_continuous(breaks = c(0, 5, 10, 15, 20, 25), 
-                     labels = c("0", "5", "10", "15", "20", "25"))
-
+                     labels = c("0", "5", "10", "15", "20", "25")) +
+  theme_calc()
+  
 ```
 
+
+```{r TX, echo = FALSE, cache = TRUE}
+
+#Here I want to visualize the distribution of texas hospitals by hospital beds with attention to critical access designation. 
+#First I read in the data and select texas critical access hospitals.
+
+tx_hospitals_2019 <- read_excel("CAH Data/TX GenSpecHosDirectory.xlsx") %>%
+  clean_names() %>%
+  mutate(name = tolower(name),
+         zip = as.character(zip)) 
+
+tx_cahs_2019 <- cahs_2019 %>%
+  filter(state == "TX") %>%
+  mutate(critical_access = 1,
+         name = tolower(name))
+
+##Then I match the datasets using my hand constructed matching spreadsheet. 
+
+tx_match_2019 <- read_excel("matching.xlsx") %>%
+  full_join(tx_hospitals_2019, by = c("name_hospital" = "name", "city_hospital" = "city")) %>%
+  full_join(tx_cahs_2019, by = c("name_cah" = "name", "city_cah" = "city")) %>%
+  mutate(critical_access = replace_na(critical_access, 0),
+         critical_access = as.factor(critical_access))
+
+#Finally I made a bar chart. 
+
+tx_match_2019 %>%
+  filter(total_beds < 51) %>%
+  ggplot(aes(x = total_beds, fill = critical_access)) +
+  geom_bar() +
+  labs(title = "Hospital Beds in Texas Hospitals",
+       subtitle = "(Hospital with 50 or fewer beds in 2019)",
+       x = "Number of Hospital Beds",
+       y = "Count of Hospitals",
+       caption = "Data from the Texas Department of Health and Human Services",
+       fill = element_blank()) +
+  scale_x_continuous(breaks = c(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50),
+                     labels = c("0", "5", "10", "15", "20", "25", "30", "35", "40", "45", "50")) +
+  scale_fill_calc(labels = c("Not CAH", "Critical Access Hospital")) +
+  theme_calc()
+
+
+```
