@@ -214,3 +214,20 @@ tx_match_2019 %>%
 
 
 ```
+
+```{r WY, echo = FALSE, cache = TRUE}
+
+cahs_all %>%
+  filter(state == "WY") %>%
+  ggplot(aes(x = year, y = beds, color = name)) +
+  geom_line() +
+  geom_jitter(width =.1, height = .1) +
+  labs(title = "Beds per hospital in WY, 2007-2019",
+       caption = "Data from Flex Monitoring Team",
+       x = "Year",
+       y = "Beds",
+       color = element_blank()) +
+  theme_calc()
+
+```
+
